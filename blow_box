@@ -1,0 +1,37 @@
+#!/bin/bash
+#blow box coordinates by coarse factor and change box size if requested
+echo -e "Prepare to change box coordinates (EMAN2 format) in current folder: [$PWD]"
+echo -e "Make sure that box files and original micrographs have same numbering!"
+if ls *.box &> /dev/null
+then :
+else
+echo "No box files found! Exiting.." && exit 1
+fi
+
+echo -en "Coarse factor (1,2,4,6 etc): "
+read Blow
+echo -en "New box size: "
+read NewBox
+echo -en "Basename of original micrographs: "
+read BaSe
+rm -f ${BaSe}*.box
+
+ex=`ls *.box | tail -1`
+OldBox=`cat $ex | awk 'NR==1 {print $3;}'`
+HalfBox=$(($OldBox/2))
+NewHalfBox=$(($NewBox/2))
+
+echo -e "Starting calculation of new box coordinates.." > boxing.log
+for i in `ls *.box`
+do
+Num=`echo $i | sed 's/[^0-9]*//g'`
+echo -n "Checking $i..."  >> boxing.log
+cat $i | awk -v ha="$HalfBox" -v bl="$Blow" -v ne="$NewHalfBox" -v bo="$NewBox" '{printf "%-8d%-6d%6d%8d\n",($1+ha)*bl-ne,($2+ha)*bl-ne,bo,bo}' > ${BaSe}${Num}.box
+err=`cat ${BaSe}${Num}.box | awk '$1 ~ /-/ || $2 ~ /-/' | wc -l`
+if [ "$err" -gt 0 ]
+then echo "$err boxes are too big to fit in the micrograph!" >> boxing.log
+else echo "OK!" >> boxing.log
+fi
+done
+
+echo "Done! Your new box files are ${BaSe}*.box. Check boxing.log file!"
