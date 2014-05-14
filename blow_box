@@ -7,13 +7,25 @@ then :
 else
 echo "No box files found! Exiting.." && exit 1
 fi
-
 echo -en "Coarse factor (1,2,4,6 etc): "
 read Blow
 echo -en "New box size: "
 read NewBox
 echo -en "Basename of original micrographs: "
 read BaSe
+echo -en "Remove particles outside micrograph border? (y/n) "
+read Ans
+case $Ans in
+y|Y|YES|yes|Yes)
+ ans=1
+ ;;
+n|N|NO|no|No)
+ ans=0
+ ;;
+*)
+ echo "Please enter only y or n! Aborting." && exit 1
+ ;;
+esac
 rm -f ${BaSe}*.box
 
 ex=`ls *.box | tail -1`
@@ -21,16 +33,25 @@ OldBox=`cat $ex | awk 'NR==1 {print $3;}'`
 HalfBox=$(($OldBox/2))
 NewHalfBox=$(($NewBox/2))
 
-echo -e "Starting calculation of new box coordinates.." > boxing.log
+echo -e "Starting calculation of new box coordinates.." | tee boxing.log
 for i in `ls *.box`
 do
 Num=`echo $i | sed 's/[^0-9]*//g'`
-echo -n "Checking $i..."  >> boxing.log
+echo -n "Checking $i..." | tee -a boxing.log
 cat $i | awk -v ha="$HalfBox" -v bl="$Blow" -v ne="$NewHalfBox" -v bo="$NewBox" '{printf "%-8d%-6d%6d%8d\n",($1+ha)*bl-ne,($2+ha)*bl-ne,bo,bo}' > ${BaSe}${Num}.box
 err=`cat ${BaSe}${Num}.box | awk '$1 ~ /-/ || $2 ~ /-/' | wc -l`
 if [ "$err" -gt 0 ]
-then echo "$err boxes are too big to fit in the micrograph!" >> boxing.log
-else echo "OK!" >> boxing.log
+then echo "$err boxes are too big to fit in the micrograph!" | tee -a boxing.log
+case $ans in
+1)
+ sed --in-place '/-/d' ${BaSe}${Num}.box
+ echo -n "Removed!" | tee -a boxing.log
+ ;;
+0)
+ echo ".." | tee -a boxing.log
+ ;;
+esac
+else echo "OK!" | tee -a boxing.log
 fi
 done
 
