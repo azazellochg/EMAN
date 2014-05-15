@@ -1,58 +1,52 @@
 #!/bin/bash
 #blow box coordinates by coarse factor and change box size if requested
-echo -e "Prepare to change box coordinates (EMAN2 format) in current folder: [$PWD]"
-echo -e "Make sure that box files and original micrographs have same numbering!"
+echo "Prepare to change box coordinates (EMAN2 format) in current folder: [$PWD]"
+echo "Make sure that box files and original micrographs have same numbering!"
 if ls *.box &> /dev/null
 then :
 else
 echo "No box files found! Exiting.." && exit 1
 fi
-echo -en "Coarse factor (1,2,4,6 etc): "
+echo -n "Coarse factor (1,2,4,6 etc): "
 read Blow
-echo -en "New box size: "
+echo -n "New box size: "
 read NewBox
-echo -en "Basename of original micrographs: "
+echo -n "Basename of output box files: "
 read BaSe
-echo -en "Remove particles outside micrograph border? (y/n) "
-read Ans
-case $Ans in
-y|Y|YES|yes|Yes)
- ans=1
- ;;
-n|N|NO|no|No)
- ans=0
- ;;
-*)
- echo "Please enter only y or n! Aborting." && exit 1
- ;;
-esac
+echo -n "Size of blowed micrographs (e.g. 1024,2048,4096): [2048] "
+read mic
+: mic={$mic:=2048}
+echo -n "Remove all boxes closer than X pixels to the borders: [2]"
+read pix
+: pix={$pix:-2}
+B0=$pix
+BXY=$((mic-pix))
 rm -f ${BaSe}*.box
-
 ex=`ls *.box | tail -1`
 OldBox=`cat $ex | awk 'NR==1 {print $3;}'`
-HalfBox=$(($OldBox/2))
 NewHalfBox=$(($NewBox/2))
-
 echo -e "Starting calculation of new box coordinates.." | tee boxing.log
 for i in `ls *.box`
 do
 Num=`echo $i | sed 's/[^0-9]*//g'`
 echo -n "Checking $i..." | tee -a boxing.log
-cat $i | awk -v ha="$HalfBox" -v bl="$Blow" -v ne="$NewHalfBox" -v bo="$NewBox" '{printf "%-8d%-6d%6d%8d\n",($1+ha)*bl-ne,($2+ha)*bl-ne,bo,bo}' > ${BaSe}${Num}.box
-err=`cat ${BaSe}${Num}.box | awk '$1 ~ /-/ || $2 ~ /-/' | wc -l`
-if [ "$err" -gt 0 ]
-then echo "$err boxes are too big to fit in the micrograph!" | tee -a boxing.log
-case $ans in
-1)
- sed --in-place '/-/d' ${BaSe}${Num}.box
- echo -n "Removed!" | tee -a boxing.log
- ;;
-0)
- echo ".." | tee -a boxing.log
- ;;
-esac
-else echo "OK!" | tee -a boxing.log
+count=0
+while read -r line
+do
+Xold=`echo ${line} | awk '{print $1}'`
+Yold=`echo ${line} | awk '{print $2}'`
+Xnew=$((Xold*Blow))
+Ynew=$((Yold*Blow))
+X1=$((Xnew-NewHalfBox))
+X2=$((Xnew+NewHalfBox))
+Y1=$((Ynew-NewHalfBox))
+Y2=$((Ynew+NewHalfBox))
+if [ "$X1" -gt "$B0" ] && [ "$Y1" -gt "$B0" ] && [ "$X2" -lt "$BXY" ] && [ "$Y2" -lt "$BXY" ];then
+printf "%-8d%-6d%6d%8d\n" $Xnew $Ynew $NewBox $NewBox >> ${BaSe}${Num}.box
+else
+((count++))
 fi
+done < $i
+[ $count -eq "0" ] || echo "${count} particles has been removed!" | tee -a boxing.log
 done
-
 echo "Done! Your new box files are ${BaSe}*.box. Check boxing.log file!"
