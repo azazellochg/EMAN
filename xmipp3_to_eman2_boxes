@@ -1,6 +1,11 @@
 #!/bin/bash
-#conversion boxes from Xmipp3.1 to eman2
+#conversion boxes from Xmipp3.1 to eman2.1
 
+#read box size and image size
+box=`tail -n 1 \`ls *.box | tail -n 1\` | awk '{print $3}'`
+echo "Micrograph size is (in pixels): "
+read mic
+#conversion
 for i in `ls *.pos | sed 's/.pos//g'`;do
-cat ${i}.pos | tail -n+7 | awk '{printf "%-8s%-8s%-8s%-8s%-8s\n",$1-1-50,2048-$2+1-50,100,100,-1}' > ${i}.box
+cat ${i}.pos | tail -n+7 | awk -v box=$box -v mic=$mic '{printf "%-8s%-8s%-8s%-8s%-8s\n",$1-1-box/2,mic-$2+1-box/2,box,box,-1}' > ${i}.box
 done
