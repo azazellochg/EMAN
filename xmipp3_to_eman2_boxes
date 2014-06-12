@@ -1,0 +1,6 @@
+#!/bin/bash
+#conversion boxes from Xmipp3.1 to eman2
+
+for i in `ls *.pos | sed 's/.pos//g'`;do
+cat ${i}.pos | tail -n+7 | awk '{printf "%-8s%-8s%-8s%-8s%-8s\n",$1-1-50,2048-$2+1-50,100,100,-1}' > ${i}.box
+done
