@@ -1,32 +1,30 @@
-# This is a list of frequently used command / options in EMAN2
+## This is a list of frequently used command / options in EMAN2
 
-=====
-
-e2proc2d.py
+#### e2proc2d.py
 
   * normalize 2D
---process=normalize.edgemean
+`--process=normalize.edgemean`
 
   * remove Xray pixels
---process=threshold.clampminmax.nsigma:nsigma=4
+`--process=threshold.clampminmax.nsigma:nsigma=4`
 
   * threshold from both sides
---process=threshold.clampminmax:maxval=${UpperThres}:minval=${LowerThres}
+`--process=threshold.clampminmax:maxval=${UpperThres}:minval=${LowerThres}`
 
   * invert contrast
---mult -1
+`--mult -1`
 
   * shrink
---meanshrink 2
+`--meanshrink 2`
 
   * calculate power spectrum
---process=math.realtofft
+`--process=math.realtofft`
 
   * apply soft Gaussian mask
---process=mask.soft:inner_radius=20
+`--process=mask.soft:inner_radius=20`
 
   * convert mrc SerialEM stack to tifs
-e2proc2d.py ${i}.mrc ${i}.tif --unstacking --threed2twod
+`e2proc2d.py ${i}.mrc ${i}.tif --unstacking --threed2twod`
 
 -----
 
