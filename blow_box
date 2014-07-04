@@ -7,21 +7,24 @@ then :
 else
 echo "No box files found! Exiting.." && exit 1
 fi
-echo -n "Coarse factor (1,2,4,6 etc): "
+mkdir new_boxes
+Blow=1
+NewBox=80
+Base="img"
+mic=2048
+pix=2
+echo -n "Coarse factor (1,2,4,6 etc): [1] "
 read Blow
-echo -n "New box size: "
+echo -n "New box size: [80] "
 read NewBox
-echo -n "Basename of output box files: "
+echo -n "Basename of output box files: [img] "
 read BaSe
 echo -n "Size of blowed micrographs (e.g. 1024,2048,4096): [2048] "
 read mic
-: mic={$mic:=2048}
-echo -n "Remove all boxes closer than X pixels to the borders: [2]"
+echo -n "Remove all boxes closer than X pixels to the borders: [2] "
 read pix
-: pix={$pix:-2}
 B0=$pix
 BXY=$((mic-pix))
-rm -f ${BaSe}*.box
 ex=`ls *.box | tail -1`
 OldBox=`cat $ex | awk 'NR==1 {print $3;}'`
 NewHalfBox=$(($NewBox/2))
@@ -42,11 +45,11 @@ X2=$((Xnew+NewHalfBox))
 Y1=$((Ynew-NewHalfBox))
 Y2=$((Ynew+NewHalfBox))
 if [ "$X1" -gt "$B0" ] && [ "$Y1" -gt "$B0" ] && [ "$X2" -lt "$BXY" ] && [ "$Y2" -lt "$BXY" ];then
-printf "%-8d%-6d%6d%8d\n" $Xnew $Ynew $NewBox $NewBox >> ${BaSe}${Num}.box
+printf "%-8d%-6d%6d%8d\n" $Xnew $Ynew $NewBox $NewBox >> new_boxes/${BaSe}${Num}.box
 else
 ((count++))
 fi
 done < $i
-[ $count -eq "0" ] || echo "${count} particles has been removed!" | tee -a boxing.log
+( [ $count -eq "0" ] && echo "" ) || ( echo "${count} particles has been removed!" | tee -a boxing.log )
 done
-echo "Done! Your new box files are ${BaSe}*.box. Check boxing.log file!"
+echo "Done! Your new box files are new_boxes/${BaSe}*.box. Check boxing.log file!"
