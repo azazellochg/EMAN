@@ -1,4 +1,4 @@
-## This is a list of frequently used command / options in EMAN2
+## List of frequently used commands / options in EMAN2
 
 #### e2proc2d.py
 
