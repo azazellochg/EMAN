@@ -23,6 +23,9 @@
   * apply soft Gaussian mask
 `--process=mask.soft:inner_radius=20`
 
+  * low-pass Gaussian filter
+`--process=filter.lowpass.gauss:apix=1.71:cutoff_abs=0.1`
+
   * convert mrc SerialEM stack to tifs
 `e2proc2d.py ${i}.mrc ${i}.tif --unstacking --threed2twod`
 
