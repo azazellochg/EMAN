@@ -7,23 +7,25 @@ then :
 else
 echo "No box files found! Exiting.." && exit 1
 fi
+[ -d ./new_boxes ] && rm -rf ./new_boxes
 mkdir new_boxes
-Blow=1
-NewBox=80
-mic=2048
-pix=2
-echo -n "Coarse factor was (1,2,4,6 etc): [1] "
-read Blow
-echo -n "New box size: [80] "
-read NewBox
-echo -n "Size of uncoarsed micrographs (e.g. 1024,2048,4096): [2048] "
-read mic
-echo -n "Remove all boxes closer than X pixels to the borders: [2] "
-read pix
-B0=$pix
-BXY=$((mic-pix))
 ex=`ls *.box | tail -1`
 OldBox=`cat $ex | awk 'NR==1 {print $3;}'`
+echo -n "Coarse factor was (1,2,4,6 etc): [2] "
+read Blow
+Blow=${Blow:-2}
+NewBox=$((OldBox*Blow))
+echo -n "New box size: [${NewBox}] "
+read NewBox
+[ -z ${NewBox} ] && NewBox=$((OldBox*Blow))
+echo -n "Size of uncoarsed micrographs (e.g. 1024,2048,4096): [4096] "
+read mic 
+mic=${mic:-4096}
+echo -n "Remove all boxes closer than X pixels to the borders: [2] "
+read pix 
+pix=${pix:-2}
+B0=$pix
+BXY=$((mic-pix))
 NewHalfBox=$(($NewBox/2))
 echo -e "Starting calculation of new box coordinates.." | tee boxing.log
 for i in `ls *.box`
@@ -47,6 +49,6 @@ else
 ((count++))
 fi
 done < $i
-( [ $count -eq "0" ] && echo "" ) || ( echo "${count} particles has been removed!" | tee -a boxing.log )
+( [ $count -eq "0" ] && echo "" | tee -a boxing.log ) || ( echo "${count} particles has been removed!" | tee -a boxing.log )
 done
 echo "Done! Your new box files are new_boxes/*.box. Check boxing.log file!"
