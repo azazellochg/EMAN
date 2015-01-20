@@ -10,15 +10,12 @@ fi
 mkdir new_boxes
 Blow=1
 NewBox=80
-Base="img"
 mic=2048
 pix=2
 echo -n "Coarse factor was (1,2,4,6 etc): [1] "
 read Blow
 echo -n "New box size: [80] "
 read NewBox
-echo -n "Basename of output box files: [img] "
-read BaSe
 echo -n "Size of uncoarsed micrographs (e.g. 1024,2048,4096): [2048] "
 read mic
 echo -n "Remove all boxes closer than X pixels to the borders: [2] "
@@ -31,7 +28,7 @@ NewHalfBox=$(($NewBox/2))
 echo -e "Starting calculation of new box coordinates.." | tee boxing.log
 for i in `ls *.box`
 do
-Num=`echo $i | sed 's/[^0-9]*//g'`
+Name=`echo $i | sed 's/.box//g'`
 echo -n "Checking $i..." | tee -a boxing.log
 count=0
 while read -r line
@@ -45,11 +42,11 @@ X2=$((Xnew+NewHalfBox))
 Y1=$((Ynew-NewHalfBox))
 Y2=$((Ynew+NewHalfBox))
 if [ "$X1" -gt "$B0" ] && [ "$Y1" -gt "$B0" ] && [ "$X2" -lt "$BXY" ] && [ "$Y2" -lt "$BXY" ];then
-printf "%-8d%-6d%6d%8d\n" $Xnew $Ynew $NewBox $NewBox >> new_boxes/${BaSe}${Num}.box
+printf "%-8d%-6d%6d%8d\n" $Xnew $Ynew $NewBox $NewBox >> new_boxes/${Name}.box
 else
 ((count++))
 fi
 done < $i
 ( [ $count -eq "0" ] && echo "" ) || ( echo "${count} particles has been removed!" | tee -a boxing.log )
 done
-echo "Done! Your new box files are new_boxes/${BaSe}*.box. Check boxing.log file!"
+echo "Done! Your new box files are new_boxes/*.box. Check boxing.log file!"
