@@ -2,7 +2,7 @@
 
 #### e2proc2d.py
 
-  * normalize 2D
+  * normalize 2D: avg = 0, stdev = 1
 `--process=normalize.edgemean`
 
   * remove Xray pixels
@@ -20,11 +20,17 @@
   * calculate power spectrum
 `--process=math.realtofft`
 
-  * apply soft Gaussian mask
+  * apply soft Gaussian mask 
 `--process=mask.soft:inner_radius=20`
 
-  * low-pass Gaussian filter
-`--process=filter.lowpass.gauss:apix=1.71:cutoff_abs=0.1`
+  * low-pass Gaussian filter: 10A
+`--process=filter.lowpass.gauss:apix=1.71:cutoff_freq=0.1`
+
+  * high-pass Gausiian filter: 50A
+ `--process=filter.highpass.gauss:apix=1.71:cutoff_freq=0.5`
+
+  * apply a soft 3D sphere of 30px radius to the volume
+ `e2proc3d.py volume.hdf sphere.hdf --process testimage.circlesphere:fill=1:radius=30 --process=mask.soft:inner_radius=30`
 
   * convert mrc SerialEM stack to tifs
 `e2proc2d.py ${i}.mrc ${i}.tif --unstacking --threed2twod`
