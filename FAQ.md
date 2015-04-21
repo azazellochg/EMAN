@@ -1,6 +1,6 @@
 ## List of frequently used commands / options in EMAN2
 
-#### e2proc2d.py
+#### e2proc2d.py / e2proc3d.py
 
   * normalize 2D: avg = 0, stdev = 1
 `--process=normalize.edgemean`
@@ -30,7 +30,7 @@
  `--process=filter.highpass.gauss:apix=1.71:cutoff_freq=0.5`
 
   * apply a soft 3D sphere of 30px radius to the volume
- `e2proc3d.py volume.hdf sphere.hdf --process=testimage.circlesphere:fill=1:radius=30 --process=mask.soft:inner_radius=30`
+ `e2proc3d.py volume.hdf volume_masked.hdf --process=testimage.circlesphere:fill=1:radius=30 --process=mask.soft:inner_radius=30`
 
   * convert mrc SerialEM stack to tifs
 `e2proc2d.py ${i}.mrc ${i}.tif --unstacking --threed2twod`
