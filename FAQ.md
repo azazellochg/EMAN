@@ -29,8 +29,11 @@
   * high-pass Gausiian filter: 50A
  `--process=filter.highpass.gauss:apix=1.71:cutoff_freq=0.5`
 
-  * create a soft circle/sphere of 30px radius (you need input dummy image with appropriate size)
- `e2proc2d.py dummy.mrc mask.mrc --process=testimage.circlesphere:fill=1:radius=50 --process=mask.soft:inner_radius=30`
+  * create a soft circular mask of 60px radius, image 80x80px, filling 1
+ `e2proc2d.py :80:80:1 mask.mrc --process=mask.soft:outer_radius=60`
+
+  * create a soft spherical mask of 60px radius, image 80x80x80px, filling 1
+ `e2proc3d.py :80:80:80:1 mask.mrc --process=mask.soft:outer_radius=60`
 
   * convert mrc SerialEM stack to tifs
 `e2proc2d.py ${i}.mrc ${i}.tif --unstacking --threed2twod`
