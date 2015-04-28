@@ -6,6 +6,9 @@
 
 `--process=normalize.edgemean`
 
+----
+##### Thresholding
+
   * remove Xray pixels
 
 `--process=threshold.clampminmax.nsigma:nsigma=4`
@@ -17,6 +20,8 @@
   * binarize image (all pixels below threshold are set to 0)
 
 `--process=threshold.binary:value=0.7`
+
+----
 
   * invert contrast
 
@@ -37,6 +42,9 @@
   * rotational average of images
 
 `--process=math.rotationalaverage`
+
+----
+##### Masks
 
   * apply soft Gaussian mask 
 
@@ -61,6 +69,9 @@ Mask center can be shifted from the box center by dx/dy/dz, e.g.
 
 `--process=mask.soft:dx=25:dy=25:dz=25:outer_radius=20`
 
+----
+##### File conversions
+
   * convert mrc SerialEM stack to tifs
 
 `e2proc2d.py ${i}.mrc ${i}.tif --unstacking --threed2twod`
@@ -68,8 +79,3 @@ Mask center can be shifted from the box center by dx/dy/dz, e.g.
   * extract several images from a file
 
 `--first=2 --last=4`
-
-
-
------
-
