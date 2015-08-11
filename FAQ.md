@@ -79,3 +79,7 @@ Mask center can be shifted from the box center by dx/dy/dz, e.g.
   * extract several images from a file
 
 `--first=2 --last=4`
+
+  * create a montage (e.g., 5 images per row) from a stack file
+
+`sxmontage.py stack.mrcs montage.mrc --N 5`
