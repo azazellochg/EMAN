@@ -27,9 +27,9 @@
 
 `--mult -1`
 
-  * shrink
+  * shrink in Fourier space
 
-`--meanshrink 2`
+`--process math.fft.resample:n=2`
 
   * calculate power spectrum
 
