@@ -1,54 +1,68 @@
-#!/bin/bash
-#blow box coordinates by coarse factor and change box size if requested
-echo "Prepare to change box coordinates (EMAN2 format) in current folder: [$PWD]"
-echo "Make sure that box files and original micrographs have same numbering!"
-if ls *.box &> /dev/null
-then :
-else
-echo "No box files found! Exiting.." && exit 1
-fi
-[ -d ./new_boxes ] && rm -rf ./new_boxes
+#!/bin/bash -x
+echo "This script will change box files: box size / coarse factor / remove boxes too close to micrograph edge"
+[ -d new_boxes ] && rm -rf new_boxes
 mkdir new_boxes
-ex=`ls *.box | tail -1`
-OldBox=`cat $ex | awk 'NR==1 {print $3;}'`
-echo -n "Coarse factor was (1,2,4,6 etc): [2] "
-read Blow
-Blow=${Blow:-2}
-NewBox=$((OldBox*Blow))
-echo -n "New box size: [${NewBox}] "
-read NewBox
-[ -z ${NewBox} ] && NewBox=$((OldBox*Blow))
-echo -n "Size of uncoarsed micrographs (e.g. 1024,2048,4096): [4096] "
-read mic 
-mic=${mic:-4096}
-echo -n "Remove all boxes closer than X pixels to the borders: [2] "
-read pix 
-pix=${pix:-2}
-B0=$pix
-BXY=$((mic-pix))
-NewHalfBox=$(($NewBox/2))
-echo -e "Starting calculation of new box coordinates.." | tee boxing.log
-for i in `ls *.box`
+#get original box size, mic size, blow factor and distance
+echo -n "Micrograph size for input boxes (px): [default 1024] "
+read micSize
+: micSize=${micSize:=1024}
+boxFile=`ls *.box | head -1`
+[ ! -f $boxFile ] && echo "No box files found!" && exit 1
+boxSize=`awk 'NR==2{print $3}' $boxFile`
+echo -n "Blow factor to apply (e.g., use -2 to coarse twice or +4 to increase boxes 4 times): [default +2] "
+read blowFactor
+: blowFactor=${blowFactor:="+2"}
+factor=`echo "$blowFactor" | sed 's/[^1-9]//g'`
+(echo $blowFactor | grep "+") && blow=1 || blow=0
+[ $blow -eq 1 ] && newBoxSizeDef=$((boxSize*factor)) || newBoxSizeDef=$((boxSize/factor))
+echo -n "Choose new box size (px): [default $newBoxSizeDef] "
+read newBoxSize
+: newBoxSize=${newBoxSize:=$newBoxSizeDef}
+echo -n "Min distance from box edge to micrograph boundary (px): [default 2] "
+read boxDist
+: boxDist=${boxDist:=2}
+#calculate new mic edges
+[ $blow -eq 1 ] && newMicSize=$((micSize*factor)) || newMicSize=$((micSize/factor))
+micEdge=$((newMicSize-boxDist))
+#check box files
+for filename in `ls *.box`
 do
-Name=`echo $i | sed 's/.box//g'`
-echo -n "Checking $i..." | tee -a boxing.log
-count=0
-while read -r line
-do
-Xold=`echo ${line} | awk '{print $1}'`
-Yold=`echo ${line} | awk '{print $2}'`
-Xnew=$((Xold*Blow))
-Ynew=$((Yold*Blow))
-X1=$((Xnew-NewHalfBox))
-X2=$((Xnew+NewHalfBox))
-Y1=$((Ynew-NewHalfBox))
-Y2=$((Ynew+NewHalfBox))
-if [ "$X1" -gt "$B0" ] && [ "$Y1" -gt "$B0" ] && [ "$X2" -lt "$BXY" ] && [ "$Y2" -lt "$BXY" ];then
-printf "%-8d%-6d%6d%8d\n" $Xnew $Ynew $NewBox $NewBox >> new_boxes/${Name}.box
-else
-((count++))
-fi
-done < $i
-( [ $count -eq "0" ] && echo "" | tee -a boxing.log ) || ( echo "${count} particles has been removed!" | tee -a boxing.log )
+        awk -v micEdge=$micEdge -v boxDist=$boxDist -v boxSize=$boxSize -v newBoxSize=$newBoxSize -v blow=$blow -v factor=$factor '{
+        #calculate old box center
+        centerX=$1+boxSize/2
+        centerY=$2+boxSize/2
+
+        #blow/coarse box size
+        if ( blow==1 )
+                {
+                newcenterX=centerX*factor;
+                newcenterY=centerY*factor;
+                }
+        else
+                {
+                newcenterX=centerX/factor;
+                newcenterY=centerY/factor;
+                }
+
+        #calculate new bottom left coordinates
+        newCoordX=newcenterX-newBoxSize/2
+        newCoordY=newcenterY-newBoxSize/2
+
+        #calculate new box edges
+        topEdge=newCoordY+newBoxSize
+        bottomEdge=newCoordY
+        leftEdge=newCoordX
+        rightEdge=newCoordX+newBoxSize
+
+        #check edges
+        if( leftEdge>boxDist && rightEdge<micEdge && topEdge<micEdge && bottomEdge>boxDist )
+                {
+                $1=newCoordX;
+                $2=newCoordY;
+                $3=newBoxSize;
+                $4=newBoxSize;
+                print;
+                }
+        }' $filename > new_boxes/${filename}
 done
-echo "Done! Your new box files are new_boxes/*.box. Check boxing.log file!"
+echo "Done!"
