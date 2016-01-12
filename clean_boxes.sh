@@ -15,12 +15,12 @@ micEdge=$((micSize-boxDist))
 #check box files
 for filename in `ls *.box`
 do
-        awk -v micEdge=$micEdge -v boxSize=$boxSize '{
+        awk -v micEdge=$micEdge -v boxDist=$boxDist -v boxSize=$boxSize '{
         topEdge=$2+boxSize
         bottomEdge=$2
         leftEdge=$1
         rightEdge=$1+boxSize
-        if( leftEdge>0 && rightEdge<micEdge && topEdge<micEdge && bottomEdge>0 ){print}}' $filename > ${filename}.tmp
+        if( leftEdge>boxDist && rightEdge<micEdge && topEdge<micEdge && bottomEdge>boxDist ){print}}' $filename > ${filename}.tmp
         mv ${filename}.tmp $filename
 done
 echo "Done!"
