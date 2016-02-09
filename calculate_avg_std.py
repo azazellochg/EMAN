@@ -2,7 +2,6 @@
 # simple script to calculate avg and std for an image stack (c) Steve Ludtke
 
 from EMAN2 import *
-import numpy as np
 
 stack = "stack.hdf"
 count = EMUtil.get_image_count(stack)
