@@ -44,18 +44,18 @@
 `--process=math.rotationalaverage`
 
 ----
-##### Masks
+##### Masks anf filters
 
   * apply soft Gaussian mask 
 
 `--process=mask.soft:inner_radius=20`
 
-  * low-pass Gaussian filter: 10A
+  * low-pass Gaussian filter: 10A (1.71/10 = 0.171 A^(-1))
 
-`--process=filter.lowpass.gauss:apix=1.71:cutoff_freq=0.1`
+`--process=filter.lowpass.gauss:apix=1.71:cutoff_freq=0.171`
 
-  * high-pass Gausiian filter: 50A
- `--process=filter.highpass.gauss:apix=1.71:cutoff_freq=0.5`
+  * high-pass Gausiian filter: 50A (1.71/50 = 0.0342)
+ `--process=filter.highpass.gauss:apix=1.71:cutoff_freq=0.0342`
 
   * create a soft circular mask of 60px radius, image 80x80px, filling 1
 
