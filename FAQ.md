@@ -44,17 +44,18 @@
 `--process=math.rotationalaverage`
 
 ----
-##### Masks anf filters
+##### Masks and filters
 
   * apply soft Gaussian mask 
 
 `--process=mask.soft:inner_radius=20`
 
-  * low-pass Gaussian filter: 10A (1.71/10 = 0.171 A^(-1))
+  * low-pass Gaussian filter: 10A (1.71/10 = 0.171)
 
 `--process=filter.lowpass.gauss:apix=1.71:cutoff_freq=0.171`
 
   * high-pass Gausiian filter: 50A (1.71/50 = 0.0342)
+
  `--process=filter.highpass.gauss:apix=1.71:cutoff_freq=0.0342`
 
   * create a soft circular mask of 60px radius, image 80x80px, filling 1
@@ -65,7 +66,7 @@
 
  `e2proc3d.py :80:80:80:1 mask.mrc --process=mask.soft:outer_radius=60`
 
-Mask center can be shifted from the box center by dx/dy/dz, e.g. 
+Mask center can be shifted from the box center by dx/dy/dz, e.g.: 
 
 `--process=mask.soft:dx=25:dy=25:dz=25:outer_radius=20`
 
