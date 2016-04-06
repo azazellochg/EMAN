@@ -70,6 +70,12 @@ Mask center can be shifted from the box center by dx/dy/dz, e.g.:
 
 `--process=mask.soft:dx=25:dy=25:dz=25:outer_radius=20`
 
+  * create a threshold-based mask (expand 3px) with soft edge (3px) and values [0-1]:
+ 
+ ```bash
+e2proc3d.py volume.mrc mask.mrc --process=mask.auto3d:nmaxseed=12:nshells=3:nshellsgauss=3:return_mask=1:threshold=0.0186:verbose=9 --process=threshold.clampminmax:maxval=1:minval=0
+```
+
 ----
 ##### File conversions
 
