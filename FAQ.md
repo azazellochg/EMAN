@@ -6,6 +6,10 @@
 
 `--process=normalize.edgemean`
 
+  * flip the hand of a 3D map: x-y plane
+
+e2proc3d.py map.mrc map_flip.mrc --process xform.flip:axis=z
+
 ----
 ##### Thresholding
 
