@@ -8,7 +8,14 @@
 
   * flip the hand of a 3D map: x-y plane
 
-e2proc3d.py map.mrc map_flip.mrc --process xform.flip:axis=z
+`e2proc3d.py map.mrc map_flip.mrc --process xform.flip:axis=z`
+
+----
+##### Test objects
+
+  * ellipsoid
+ 
+`e2proc3d.py :80:80:80 ellipsoid.mrc --process=testimage.ellipsoid:a=10:b=30:c=5` will create an ellipsoid in a 80px box
 
 ----
 ##### Thresholding
