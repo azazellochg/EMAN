@@ -18,6 +18,14 @@
 `e2proc3d.py :80:80:80 ellipsoid.mrc --process=testimage.ellipsoid:a=10:b=30:c=5` will create an ellipsoid in a 80px box
 
 ----
+##### Rescaling
+
+  * If you have a volume (80x80x80) with voxel size of 2.3 A. You would like to convert this to voxel size of 1.5 A and 128px box: `e2proc3d.py input.hdf output.hdf --clip=128,128,128 --scale=3.45`.
+  
+  If scale > 1 you need to do --clip before --scale. If scale < 1, you should do scale before clip (in this case, you may also need to consider using --meanshrink, possibly with a lowpass filter).
+
+
+----
 ##### Thresholding
 
   * remove Xray pixels
