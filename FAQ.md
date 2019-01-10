@@ -12,10 +12,13 @@
 
 ----
 ##### Test objects
+  * ring
+ 
+`e2proc2d.py :80:80:1 ring.hdf --process=mask.sharp:outer_radius=30:inner_radius=20` will create a sharp ring (2D) in a 80px box
 
   * ellipsoid
  
-`e2proc3d.py :80:80:80 ellipsoid.mrc --process=testimage.ellipsoid:a=10:b=30:c=5` will create an ellipsoid in a 80px box
+`e2proc3d.py :80:80:80 ellipsoid.mrc --process=testimage.ellipsoid:a=10:b=30:c=5` will create an ellipsoid (3D) in a 80px box
 
 ----
 ##### Rescaling
@@ -32,13 +35,13 @@
 
 `--process=threshold.clampminmax.nsigma:nsigma=4`
 
-  * threshold from both sides
+  * threshold from both sides (to values between 0 and 1)
 
-`--process=threshold.clampminmax:maxval=${UpperThres}:minval=${LowerThres}`
+`--process=threshold.clampminmax:maxval=1:minval=0`
 
   * binarize image (all pixels below threshold are set to 0)
 
-`--process=threshold.binary:value=0.7`
+`--process=threshold.binary:value=0.7` using a threshold of 0.7
 
 ----
 
@@ -69,11 +72,11 @@
 
 `--process=mask.soft:inner_radius=20`
 
-  * low-pass Gaussian filter: 10A (1.71/10 = 0.171)
+  * low-pass Gaussian filter: 10A (1.71[A/px]/10[A] = 0.171)
 
 `--process=filter.lowpass.gauss:apix=1.71:cutoff_freq=0.171`
 
-  * high-pass Gausiian filter: 50A (1.71/50 = 0.0342)
+  * high-pass Gausiian filter: 50A (1.71[A/px]/50[A] = 0.0342)
 
  `--process=filter.highpass.gauss:apix=1.71:cutoff_freq=0.0342`
 
@@ -101,6 +104,10 @@ e2proc3d.py volume.mrc mask.mrc --process=mask.auto3d:nmaxseed=12:nshells=3:nshe
   * convert mrc SerialEM stack to tifs
 
 `e2proc2d.py ${i}.mrc ${i}.tif --unstacking --threed2twod`
+
+  * convert all mrc files to hdf
+  
+`e2proc2d.py *.mrc @.hdf`
 
   * extract several images from a file
 
