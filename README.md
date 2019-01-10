@@ -1,6 +1,8 @@
 EMAN
 ====
 
+EMAN conventions can be found here: https://github.com/azazellochg/3DEM-conventions/blob/master/eman2.md
+
 ### Scripts for EMAN2
 
 ##### FAQ
